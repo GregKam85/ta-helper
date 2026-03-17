@@ -66,7 +66,9 @@ def generate_new_video_nfo(chan_name, title, video_meta_data):
     logger.info("Generating NFO file and subtitle symlink for %s video: %s", video_meta_data['channel']['channel_name'], video_meta_data['title'])
     # TA has added a new video.  Create a symlink to subtitles and an NFO file for media managers.
     video_basename = os.path.splitext(video_meta_data['media_url'])[0]
-    os.symlink(TA_MEDIA_FOLDER + video_basename + ".en.vtt", TARGET_FOLDER + "/" + chan_name + "/" + title.replace(".mp4",".en.vtt"))
+    vtt_file = TA_MEDIA_FOLDER + video_basename + ".en.vtt"
+    if(os.path.isfile(vtt_file)):
+        os.symlink(vtt_file, TARGET_FOLDER + "/" + chan_name + "/" + title.replace(".mp4",".en.vtt"))
     title = title.replace('.mp4','.nfo')
     f= open(TARGET_FOLDER + "/" + chan_name + "/" + title,"w+")
     f.write('<?xml version="1.0" ?>\n<episodedetails>\n\t' +
