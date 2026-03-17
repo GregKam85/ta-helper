@@ -42,12 +42,14 @@ def setup_new_channel_resources(chan_name, chan_data):
     else:
         # Link the channel logo from TA docker cache into target folder for media managers
         # and file explorers.  Provide cover.jpg, poster.jpg and banner.jpg symlinks.
-        channel_thumb_path = TA_CACHE + chan_data['channel_thumb_url']
+        channel_thumb_path = TA_CACHE + chan_data['channel_thumb_url'].replace('/cache/','/')
+                                                                                               
+                                                                                             
         logger.info("Symlink cache %s thumb to poster, cover and folder.jpg files.", channel_thumb_path)
         os.symlink(channel_thumb_path, TARGET_FOLDER + "/" + chan_name + "/" + "poster.jpg")
         os.symlink(channel_thumb_path, TARGET_FOLDER + "/" + chan_name + "/" + "cover.jpg")
         os.symlink(channel_thumb_path, TARGET_FOLDER + "/" + chan_name + "/" + "folder.jpg")
-        channel_banner_path = TA_CACHE + chan_data['channel_banner_url']
+        channel_banner_path = TA_CACHE + chan_data['channel_banner_url'].replace('/cache/','/')
         os.symlink(channel_banner_path, TARGET_FOLDER + "/" + chan_name + "/" + "banner.jpg")
     
     # Generate tvshow.nfo for media managers, no TA_CACHE required.
@@ -66,7 +68,9 @@ def generate_new_video_nfo(chan_name, title, video_meta_data):
     logger.info("Generating NFO file and subtitle symlink for %s video: %s", video_meta_data['channel']['channel_name'], video_meta_data['title'])
     # TA has added a new video.  Create a symlink to subtitles and an NFO file for media managers.
     video_basename = os.path.splitext(video_meta_data['media_url'])[0]
-    os.symlink(TA_MEDIA_FOLDER + video_basename + ".en.vtt", TARGET_FOLDER + "/" + chan_name + "/" + title.replace(".mp4",".en.vtt"))
+    vtt_file = TA_MEDIA_FOLDER + video_basename + ".en.vtt"
+    if(os.path.isfile(vtt_file)):
+        os.symlink(vtt_file, TARGET_FOLDER + "/" + chan_name + "/" + title.replace(".mp4",".en.vtt"))
     title = title.replace('.mp4','.nfo')
     f= open(TARGET_FOLDER + "/" + chan_name + "/" + title,"w+")
     f.write('<?xml version="1.0" ?>\n<episodedetails>\n\t' +
@@ -188,7 +192,7 @@ for channel in channels_data:
     logger.debug("Video Description: " + description)
     logger.debug("Channel Name: " + chan_name)
     if(len(chan_name) < 1): chan_name = channel['channel_id']
-    chan_url = url+channel['channel_id']+"/video/"
+    chan_url = TA_SERVER + '/api/video/?channel=' + channel['channel_id'] + '&sort=published&order=desc&type=videos'
     try:
         os.makedirs(TARGET_FOLDER + "/" + chan_name, exist_ok = False)
         setup_new_channel_resources(chan_name, channel)
@@ -206,7 +210,7 @@ for channel in channels_data:
             chan_videos_data.extend(chan_videos_json['data'])
 
         for video in chan_videos_data:
-            video['media_url'] = video['media_url'].replace('/media','')
+            video['media_url'] = video['media_url'].replace('/media/','/').replace('/youtube/','/')
             logger.debug(video['published'] + "_" + video['youtube_id'] + "_" + urlify(video['title']) + ", " + video['media_url'])
             title=video['published'] + "_" + video['youtube_id'] + "_" + urlify(video['title']) + ".mp4"
             try:
