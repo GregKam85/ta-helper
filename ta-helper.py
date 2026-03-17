@@ -188,7 +188,7 @@ for channel in channels_data:
     logger.debug("Video Description: " + description)
     logger.debug("Channel Name: " + chan_name)
     if(len(chan_name) < 1): chan_name = channel['channel_id']
-    chan_url = url+channel['channel_id']+"/video/"
+    chan_url = TA_SERVER + '/api/video/?channel=' + channel['channel_id'] + '&sort=published&order=desc&type=videos'
     try:
         os.makedirs(TARGET_FOLDER + "/" + chan_name, exist_ok = False)
         setup_new_channel_resources(chan_name, channel)
