@@ -42,12 +42,14 @@ def setup_new_channel_resources(chan_name, chan_data):
     else:
         # Link the channel logo from TA docker cache into target folder for media managers
         # and file explorers.  Provide cover.jpg, poster.jpg and banner.jpg symlinks.
-        channel_thumb_path = TA_CACHE + chan_data['channel_thumb_url']
+        channel_thumb_path = TA_CACHE + chan_data['channel_thumb_url'].replace('/cache/','/')
+                                                                                               
+                                                                                             
         logger.info("Symlink cache %s thumb to poster, cover and folder.jpg files.", channel_thumb_path)
         os.symlink(channel_thumb_path, TARGET_FOLDER + "/" + chan_name + "/" + "poster.jpg")
         os.symlink(channel_thumb_path, TARGET_FOLDER + "/" + chan_name + "/" + "cover.jpg")
         os.symlink(channel_thumb_path, TARGET_FOLDER + "/" + chan_name + "/" + "folder.jpg")
-        channel_banner_path = TA_CACHE + chan_data['channel_banner_url']
+        channel_banner_path = TA_CACHE + chan_data['channel_banner_url'].replace('/cache/','/')
         os.symlink(channel_banner_path, TARGET_FOLDER + "/" + chan_name + "/" + "banner.jpg")
     
     # Generate tvshow.nfo for media managers, no TA_CACHE required.
