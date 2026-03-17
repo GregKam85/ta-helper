@@ -206,7 +206,7 @@ for channel in channels_data:
             chan_videos_data.extend(chan_videos_json['data'])
 
         for video in chan_videos_data:
-            video['media_url'] = video['media_url'].replace('/media','')
+            video['media_url'] = video['media_url'].replace('/media/','/').replace('/youtube/','/')
             logger.debug(video['published'] + "_" + video['youtube_id'] + "_" + urlify(video['title']) + ", " + video['media_url'])
             title=video['published'] + "_" + video['youtube_id'] + "_" + urlify(video['title']) + ".mp4"
             try:
